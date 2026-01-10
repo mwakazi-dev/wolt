@@ -53,41 +53,39 @@ const SmoothInfiniteScroll = ({
 
   const iconData = iconDataSets[iconSet];
   const items = [...iconData, ...iconData]; // Duplicate for seamless scroll
-  const totalContentHeight = iconData.length * ITEM_HEIGHT;
-  const totalWrapHeight =
-    PADDING_VERTICAL + iconData.length * (ITEM_HEIGHT + GAP);
+  const wrapPoint = iconData.length * (ITEM_HEIGHT + 2 * MARGIN_VERTICAL);
 
   useEffect(() => {
     // Calculate duration based on SCROLL_SPEED and total distance
-    const duration = (totalWrapHeight / SCROLL_SPEED) * 1000; // convert to milliseconds
+    const duration = (wrapPoint / SCROLL_SPEED) * 1000; // convert to milliseconds
 
     if (scrollDirection === "down") {
-      // Start at 0, animate to totalWrapHeight
+      // Start at 0, animate to wrapPoint
       scrollY.value = 0;
       scrollY.value = withRepeat(
-        withTiming(totalWrapHeight, { duration }),
+        withTiming(wrapPoint, { duration }),
         -1, // infinite repeats
         false // don't reverse
       );
     } else {
-      // Start at 0, animate to totalWrapHeight (for up direction, pos is reversed)
+      // Start at 0, animate to wrapPoint (for up direction, pos is reversed)
       scrollY.value = 0;
       scrollY.value = withRepeat(
-        withTiming(totalWrapHeight, { duration }),
+        withTiming(wrapPoint, { duration }),
         -1, // infinite repeats
         false // don't reverse
       );
     }
-  }, [scrollDirection, totalWrapHeight]);
+  }, [scrollDirection, wrapPoint]);
 
   useAnimatedReaction(
     () => scrollY.value,
     (y) => {
       let pos;
       if (scrollDirection === "down") {
-        pos = y % totalWrapHeight;
+        pos = y % wrapPoint;
       } else {
-        pos = totalWrapHeight - (y % totalWrapHeight);
+        pos = wrapPoint - (y % wrapPoint);
       }
       scrollTo(scrollRef, 0, pos, false);
     }
