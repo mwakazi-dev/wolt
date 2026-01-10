@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Platform, StyleSheet, Text, View } from "react-native";
 import Animated, {
   scrollTo,
   useAnimatedReaction,
@@ -52,7 +52,8 @@ const SmoothInfiniteScroll = ({
   const iconData = iconDataSets[iconSet];
   const items = [...iconData, ...iconData]; // Duplicate for seamless scroll
   const totalContentHeight = iconData.length * ITEM_HEIGHT;
-  const totalWrapHeight = totalContentHeight + iconData.length * GAP;
+  const totalWrapHeight =
+    totalContentHeight + Math.max(0, iconData.length - 1) * GAP;
 
   useEffect(() => {
     // Calculate duration based on SCROLL_SPEED and total distance
@@ -129,7 +130,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 20,
     marginHorizontal: 5,
-    boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 6,
+      },
+      android: {
+        elevation: 6,
+      },
+    }),
   },
 });
 
