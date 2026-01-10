@@ -35,7 +35,8 @@ const iconDataSets = {
 
 const ITEM_HEIGHT = 160;
 const SCROLL_SPEED = 20; // pixels per second
-const GAP = 10; // gap between items from styles
+const MARGIN_VERTICAL = 5;
+const GAP = MARGIN_VERTICAL * 2; // gap between items from styles
 
 interface SmoothInfiniteScrollProps {
   scrollDirection?: "up" | "down";
@@ -120,7 +121,6 @@ const SmoothInfiniteScroll = ({
 
 const styles = StyleSheet.create({
   container: {
-    gap: 10,
     paddingVertical: 20,
   },
   iconContainer: {
@@ -130,6 +130,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 20,
     marginHorizontal: 5,
+    marginVertical: MARGIN_VERTICAL,
     ...Platform.select({
       ios: {
         shadowColor: "#000",
