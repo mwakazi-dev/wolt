@@ -37,6 +37,7 @@ const ITEM_HEIGHT = 160;
 const SCROLL_SPEED = 20; // pixels per second
 const MARGIN_VERTICAL = 5;
 const GAP = MARGIN_VERTICAL * 2; // gap between items from styles
+const PADDING_VERTICAL = 20;
 
 interface SmoothInfiniteScrollProps {
   scrollDirection?: "up" | "down";
@@ -54,7 +55,7 @@ const SmoothInfiniteScroll = ({
   const items = [...iconData, ...iconData]; // Duplicate for seamless scroll
   const totalContentHeight = iconData.length * ITEM_HEIGHT;
   const totalWrapHeight =
-    totalContentHeight + Math.max(0, iconData.length - 1) * GAP;
+    PADDING_VERTICAL + iconData.length * (ITEM_HEIGHT + GAP);
 
   useEffect(() => {
     // Calculate duration based on SCROLL_SPEED and total distance
@@ -69,10 +70,10 @@ const SmoothInfiniteScroll = ({
         false // don't reverse
       );
     } else {
-      // Start at totalWrapHeight, animate to 0
-      scrollY.value = totalWrapHeight;
+      // Start at 0, animate to totalWrapHeight (for up direction, pos is reversed)
+      scrollY.value = 0;
       scrollY.value = withRepeat(
-        withTiming(0, { duration }),
+        withTiming(totalWrapHeight, { duration }),
         -1, // infinite repeats
         false // don't reverse
       );
@@ -82,21 +83,13 @@ const SmoothInfiniteScroll = ({
   useAnimatedReaction(
     () => scrollY.value,
     (y) => {
+      let pos;
       if (scrollDirection === "down") {
-        if (y >= totalContentHeight) {
-          scrollY.value = 0;
-          scrollTo(scrollRef, 0, 0, false);
-        } else {
-          scrollTo(scrollRef, 0, y, false);
-        }
+        pos = y % totalWrapHeight;
       } else {
-        if (y <= 0) {
-          scrollY.value = totalContentHeight;
-          scrollTo(scrollRef, 0, totalContentHeight, false);
-        } else {
-          scrollTo(scrollRef, 0, y, false);
-        }
+        pos = totalWrapHeight - (y % totalWrapHeight);
       }
+      scrollTo(scrollRef, 0, pos, false);
     }
   );
 
@@ -104,6 +97,7 @@ const SmoothInfiniteScroll = ({
     <Animated.ScrollView
       ref={scrollRef}
       style={styles.container}
+      contentContainerStyle={styles.contentContainer}
       scrollEnabled={false}
       showsVerticalScrollIndicator={false}
     >
@@ -120,8 +114,9 @@ const SmoothInfiniteScroll = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
-    paddingVertical: 20,
+  container: {},
+  contentContainer: {
+    paddingVertical: PADDING_VERTICAL,
   },
   iconContainer: {
     width: 160,
